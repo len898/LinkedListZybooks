@@ -65,6 +65,9 @@ LinkedListNode* LinearSearch(LinkedListNode* head, string toSearch) {
 
 LinkedListNode* FindInsertionPoint(LinkedListNode* head, string word) {
 	LinkedListNode* iterator = head;
+	if (head->val > word) {
+		return head;
+	}
 	while (iterator->next) {
 		if (iterator->val < word && iterator->next->val > word) {
 			return iterator;
@@ -76,10 +79,54 @@ LinkedListNode* FindInsertionPoint(LinkedListNode* head, string word) {
 
 LinkedListNode* InsertNode(LinkedListNode* head, string word) {
 	LinkedListNode* nodeBeforeInsert = FindInsertionPoint(head, word);
+	if (nodeBeforeInsert == head) {
+		LinkedListNode* newNode = new LinkedListNode(word, nullptr, nodeBeforeInsert);
+		nodeBeforeInsert->prev = newNode;
+		head = newNode;
+		return newNode;
+	}
 	LinkedListNode* newNode = new LinkedListNode(word, nodeBeforeInsert, nodeBeforeInsert->next);
-	nodeBeforeInsert->next->prev = newNode;
+	if (nodeBeforeInsert->next) {
+		nodeBeforeInsert->next->prev = newNode;
+	}
 	nodeBeforeInsert->next = newNode;
 	return newNode;
+}
+
+LinkedListNode* DeleteNode(LinkedListNode* head, string word) {
+	LinkedListNode* DeletionNode = LinearSearch(head, word);
+	if (DeletionNode) {
+		if (DeletionNode->prev == nullptr) {
+			cout << "Your word was '" << word << "'. The word '" << word << "' has been deleted." << endl;
+			cout << "The next word would be '" << DeletionNode->next->val << "' " << endl;
+			cout << "There is no word before '" << word << "' " << endl;
+			DeletionNode->next->prev = nullptr;
+			LinkedListNode* tempNode = DeletionNode->next;
+			delete DeletionNode;
+			return tempNode;
+		}
+		else if (DeletionNode->next == nullptr) {
+			cout << "Your word was '" << word << "'. The word '" << word << "' has been deleted." << endl;
+			cout << "There is no word following '" << word << "' " << endl;
+			cout << "The previous word would be '" << DeletionNode->prev->val << "' " << endl;
+			DeletionNode->prev->next = nullptr;
+			delete DeletionNode;
+			return head;
+		}
+		else {
+			cout << "Your word was '" << word << "'. The word '" << word << "' has been deleted." << endl;
+			cout << "The next word would be '" << DeletionNode->next->val << "' " << endl;
+			cout << "The previous word would be '" << DeletionNode->prev->val << "' " << endl;
+			DeletionNode->next->prev = DeletionNode->prev;
+			DeletionNode->prev->next = DeletionNode->next;
+			delete DeletionNode;
+			return head;
+		}
+	}
+	else {
+		cout << "Your word was '" << word << "'. we did not find your word." << endl;
+		return head;
+	}
 }
 
 void PrintLinked(LinkedListNode* list) {
@@ -110,7 +157,19 @@ int main()
 	LinkedListNode* searchResult = LinearSearch(head, toSearch);
 
 	if (searchResult) {
-		cout << "Your word was '" << searchResult->val << "'. The next word would be '" << searchResult->next->val << "'. The previous word would be '" << searchResult->prev->val << "'.";
+		cout << "Your word was '" << searchResult->val << "'. ";
+		if (searchResult->next) {
+			cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+		}
+		else {
+			cout << "There is no word following '" << searchResult->val << "'." << endl;
+		}
+		if (searchResult->prev) {
+			cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+		}
+		else {
+			cout << "There is no word before '" << searchResult->val << "'." << endl;
+		}
 	}
 	else {
 		cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
@@ -120,15 +179,21 @@ int main()
 			cout << "The next word would be '" << insertionPoint->next->val << "'." << endl;
 		}
 		else {
-			cout << "There is no word after '" << insertionPoint->val << "'." << endl;
+			cout << "There is no word following '" << insertionPoint->val << "'." << endl;
 		}
 		if (insertionPoint->prev) {
-			cout << "The previous word would be '" << insertionPoint->prev->val << "'.";
+			cout << "The previous word would be '" << insertionPoint->prev->val << "'." << endl;
 		}
 		else {
+			head = insertionPoint;
 			cout << "There is no word before '" << insertionPoint->val << "'." << endl;
 		}
 	}
+
+	cout << "Enter a word to delete from the chosen Dictionary: " << endl;
+	string wordToDelete;
+	cin >> wordToDelete;
+	head = DeleteNode(head, wordToDelete);
 
 	PrintLinked(head);
 
