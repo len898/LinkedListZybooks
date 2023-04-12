@@ -149,53 +149,180 @@ int main()
 	for (i = 1; i < toFill.size(); i++) {
 		tail = AddNode(toFill.at(i), tail);
 	}
+	int menuChoice = -1;
+	while (menuChoice != 0) {
+		cout << "\n--------------------------------------------\n"
+			<< "Options menu: \n"
+			<< "(1) Print words\n"
+			<< "(2) Find a word\n"
+			<< "(3) Find word, insert if found (assumes words are sorted alphabetically)\n"
+			<< "(4) Find word, delete if found \n"
+			<< "(5) Swap two words\n"
+			<< "(6) Sort words (Bubble Sort or Selection Sort)\n"
+			<< "(7) Find a word - Binary Search (assumes words are sorted alphabetically)\n"
+			<< "(8) Merge two dictionaries (will sort first)\n"
+			<< "(9) Write current dictionary to file\n"
+			<< "Enter a number from 1 to 9, or 0 to exit: ";
 
-	string toSearch;
-	cout << "Enter a word to search for in the chosen Dictionary:";
-	cin >> toSearch;
+		cin >> menuChoice;
 
-	LinkedListNode* searchResult = LinearSearch(head, toSearch);
+		switch (menuChoice)
+		{
+		case 1: {
+			PrintLinked(head);
+			break;
+		}
+		case 2: {
+			string toSearch;
+			cout << "Enter a word to search for in the chosen Dictionary:";
+			cin >> toSearch;
+			LinkedListNode* searchResult = LinearSearch(head, toSearch);
+			if (searchResult) {
+				cout << "Your word was '" << searchResult->val << "'. ";
+				if (searchResult->next) {
+					cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+				}
+				else {
+					cout << "There is no word following '" << searchResult->val << "'." << endl;
+				}
+				if (searchResult->prev) {
+					cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+				}
+				else {
+					cout << "There is no word before '" << searchResult->val << "'." << endl;
+				}
+				break;
+			}
+			else {
+				cout << "Your word was '" << toSearch << "'. We did not find your word." << endl;
+				break;
+			}
+		}
+		case 3: {
+			string toSearch;
+			cout << "Enter a word to search for in the chosen Dictionary:";
+			cin >> toSearch;
+			LinkedListNode* searchResult = LinearSearch(head, toSearch);
+			if (searchResult) {
+				cout << "Your word was '" << searchResult->val << "'. ";
+				if (searchResult->next) {
+					cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+				}
+				else {
+					cout << "There is no word following '" << searchResult->val << "'." << endl;
+				}
+				if (searchResult->prev) {
+					cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+				}
+				else {
+					cout << "There is no word before '" << searchResult->val << "'." << endl;
+				}
+				break;
+			}
+			else {
+				cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
+				cout << "Inserted!" << endl;
+				LinkedListNode* insertionPoint = InsertNode(head, toSearch);
+				if (insertionPoint->next) {
+					cout << "The next word would be '" << insertionPoint->next->val << "'." << endl;
+				}
+				else {
+					cout << "There is no word following '" << insertionPoint->val << "'." << endl;
+				}
+				if (insertionPoint->prev) {
+					cout << "The previous word would be '" << insertionPoint->prev->val << "'." << endl;
+				}
+				else {
+					head = insertionPoint;
+					cout << "There is no word before '" << insertionPoint->val << "'." << endl;
+				}
+				break;
+			}
+		}
+		case 4: {
+			string toSearch;
+			cout << "Enter a word to find and delete in the chosen Dictionary:";
+			cin >> toSearch;
 
-	if (searchResult) {
-		cout << "Your word was '" << searchResult->val << "'. ";
-		if (searchResult->next) {
-			cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+			LinkedListNode* searchResult = LinearSearch(head, toSearch);
+			head = DeleteNode(head, toSearch);
+			break;
 		}
-		else {
-			cout << "There is no word following '" << searchResult->val << "'." << endl;
+		case 5: {
+			cout << "Coming soon!" << endl;
+			break;
 		}
-		if (searchResult->prev) {
-			cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+		case 6: {
+			cout << "Coming soon!" << endl;
+			break;
 		}
-		else {
-			cout << "There is no word before '" << searchResult->val << "'." << endl;
+		case 7: {
+			cout << "Coming soon!" << endl;
+			break;
 		}
+		case 8: {
+			cout << "Coming soon!" << endl;
+			break;
+		}
+		case 9: {
+			cout << "Coming soon!" << endl;
+			break;
+		}
+		default:
+			//cout << "Please enter a valid number";
+			break;
+		}
+
 	}
-	else {
-		cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
-		cout << "Inserted!" << endl;
-		LinkedListNode* insertionPoint = InsertNode(head, toSearch);
-		if (insertionPoint->next) {
-			cout << "The next word would be '" << insertionPoint->next->val << "'." << endl;
-		}
-		else {
-			cout << "There is no word following '" << insertionPoint->val << "'." << endl;
-		}
-		if (insertionPoint->prev) {
-			cout << "The previous word would be '" << insertionPoint->prev->val << "'." << endl;
-		}
-		else {
-			head = insertionPoint;
-			cout << "There is no word before '" << insertionPoint->val << "'." << endl;
-		}
-	}
 
-	cout << "Enter a word to delete from the chosen Dictionary: " << endl;
-	string wordToDelete;
-	cin >> wordToDelete;
-	head = DeleteNode(head, wordToDelete);
 
-	PrintLinked(head);
+	//string toSearch;
+	//cout << "Enter a word to search for in the chosen Dictionary:";
+	//cin >> toSearch;
+
+	//LinkedListNode* searchResult = LinearSearch(head, toSearch);
+
+	//if (searchResult) {
+	//	cout << "Your word was '" << searchResult->val << "'. ";
+	//	if (searchResult->next) {
+	//		cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+	//	}
+	//	else {
+	//		cout << "There is no word following '" << searchResult->val << "'." << endl;
+	//	}
+	//	if (searchResult->prev) {
+	//		cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+	//	}
+	//	else {
+	//		cout << "There is no word before '" << searchResult->val << "'." << endl;
+	//	}
+	//}
+	//else {
+	//	cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
+	//	cout << "Inserted!" << endl;
+	//	LinkedListNode* insertionPoint = InsertNode(head, toSearch);
+	//	if (insertionPoint->next) {
+	//		cout << "The next word would be '" << insertionPoint->next->val << "'." << endl;
+	//	}
+	//	else {
+	//		cout << "There is no word following '" << insertionPoint->val << "'." << endl;
+	//	}
+	//	if (insertionPoint->prev) {
+	//		cout << "The previous word would be '" << insertionPoint->prev->val << "'." << endl;
+	//	}
+	//	else {
+	//		head = insertionPoint;
+	//		cout << "There is no word before '" << insertionPoint->val << "'." << endl;
+	//	}
+	//}
+
+	//cout << "Enter a word to delete from the chosen Dictionary: " << endl;
+	//string wordToDelete;
+	//cin >> wordToDelete;
+	//head = DeleteNode(head, wordToDelete);
+
+	//PrintLinked(head);
+	cout << "Thank you! Bye!" << endl;
 
 	return 0;
 } // end main ()
