@@ -17,13 +17,24 @@
 #include <fstream>
 #include <string>
 
+#define FILE_ONE "short_dict.txt"
+#define FILE_TWO "short_dict2.txt"
+#define FILE_THREE "short_dict3.txt"
+
+#define NEW_DICT_FILE "Updated Dictionary.txt"
+#define NEW_DICT_FILE_TWO "Updated Dictionary2.txt"
+#define NEW_DICT_FILE_THREE "Updates Dictionary3.txt"
+
+ //const std::string FILE_ONE_ = std::string(FILE_ONE);
+
 using namespace std;
 
 /* function returns a vector of dictionary words - possible inputs are 1, 2, & 3 *
  * representing three different word lists. Function will return word list #3 if *
  * any integer besides 1 or 2 is passed in.                                      *
  */
-vector<string> fillVector(int choice);
+ //vector<string> fillVector(int choice);
+vector<string> fillVector(string fileName);
 
 struct LinkedListNode
 {
@@ -136,18 +147,137 @@ void PrintLinked(LinkedListNode* list) {
 	}
 }
 
+void PrintNodeWithNextAndPrev(LinkedListNode* node) {
+	cout << "Your word was '" << node->val << "'. ";
+	if (node->next) {
+		cout << "The next word would be '" << node->next->val << "'" << endl;
+	}
+	else {
+		cout << "There is no word following '" << node->val << "'" << endl;
+	}
+	if (node->prev) {
+		cout << "The previous word would be '" << node->prev->val << "'" << endl;
+	}
+	else {
+		cout << "There is no word before '" << node->val << "'" << endl;
+	}
+}
+
+LinkedListNode* SwapNodes(LinkedListNode* node1, LinkedListNode* node2) {
+	//Adapted from https://www.geeksforgeeks.org/swap-given-nodes-in-a-doubly-linked-list-without-modifying-data/#
+	LinkedListNode* tempNode = nullptr;
+	tempNode = node1->next;
+	node1->next = node2->next;
+	node2->next = tempNode;
+
+	if (node1->next != nullptr) {
+		node1->next->prev = node1;
+	}
+	if (node2->next != nullptr) {
+		node2->next->prev = node2;
+	}
+
+	tempNode = node1->prev;
+	node1->prev = node2->prev;
+	node2->prev = tempNode;
+
+	if (node1->prev != nullptr) {
+		node1->prev->next = node1;
+	}
+	if (node2->prev != nullptr) {
+		node2->prev->next = node2;
+	}
+	if (node2->val < node1->val) {
+		return node2;
+	}
+	return node1;
+}
+
+LinkedListNode* findMin(LinkedListNode* start) {
+	LinkedListNode* minNode = start;
+	LinkedListNode* traverser = start;
+	while (traverser != nullptr) {
+		if (traverser->val < minNode->val) {
+			minNode = traverser;
+		}
+		traverser = traverser->next;
+	}
+	return minNode;
+}
+
+LinkedListNode* SelectionSort(LinkedListNode* head) {
+	LinkedListNode* sortedHead = head;
+	LinkedListNode* sortedTail = sortedHead;
+	int swaps = 0;
+	int count = 0;
+
+	LinkedListNode* initialMin = findMin(sortedHead);
+	if (initialMin != sortedHead) {
+		count++;
+		sortedHead = SwapNodes(sortedHead, initialMin);
+		swaps++;
+		cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
+		PrintLinked(sortedHead);
+	}
+	else {
+		count++;
+		cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
+		PrintLinked(sortedHead);
+	}
+	sortedTail = sortedHead->next;
+
+	while (sortedTail != nullptr) {
+		count++;
+		if (findMin(sortedTail)->val < sortedTail->val) {
+			swaps++;
+			sortedTail = SwapNodes(sortedTail, findMin(sortedTail));
+		}
+		cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
+		PrintLinked(sortedHead);
+		sortedTail = sortedTail->next;
+	}
+	return sortedHead;
+}
+
+void WriteToFile(LinkedListNode* head, string fileName) {
+
+}
+
+
 
 int main()
 {
 	int dictNum;
 	cout << "Which Dictionary should be opened? Enter \"1\", \"2\", or \"3\":";
 	cin >> dictNum;
-	unsigned int i = 0;
-	vector<string> toFill = fillVector(dictNum);
-	LinkedListNode* head = AddNode(toFill.at(i));
-	LinkedListNode* tail = head;
-	for (i = 1; i < toFill.size(); i++) {
-		tail = AddNode(toFill.at(i), tail);
+	LinkedListNode* head = NULL;
+	LinkedListNode* tail = NULL;
+	if (dictNum == 1) {
+		unsigned int i = 0;
+		vector<string> toFill = fillVector(FILE_ONE);
+		head = AddNode(toFill.at(i));
+		tail = head;
+		for (i = 1; i < toFill.size(); i++) {
+			tail = AddNode(toFill.at(i), tail);
+		}
+	}
+	else if (dictNum == 2) {
+		unsigned int i = 0;
+		vector<string> toFill = fillVector(FILE_TWO);
+		head = AddNode(toFill.at(i));
+		tail = head;
+		for (i = 1; i < toFill.size(); i++) {
+			tail = AddNode(toFill.at(i), tail);
+		}
+	}
+	else if (dictNum == 3) {
+		unsigned int i = 0;
+		vector<string> toFill = fillVector(FILE_THREE);
+		head = AddNode(toFill.at(i));
+		tail = head;
+		for (i = 1; i < toFill.size(); i++) {
+			tail = AddNode(toFill.at(i), tail);
+		}
 	}
 	int menuChoice = -1;
 	while (menuChoice != 0) {
@@ -180,16 +310,16 @@ int main()
 			if (searchResult) {
 				cout << "Your word was '" << searchResult->val << "'. ";
 				if (searchResult->next) {
-					cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+					cout << "The next word would be '" << searchResult->next->val << "'" << endl;
 				}
 				else {
-					cout << "There is no word following '" << searchResult->val << "'." << endl;
+					cout << "There is no word following '" << searchResult->val << "'" << endl;
 				}
 				if (searchResult->prev) {
-					cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+					cout << "The previous word would be '" << searchResult->prev->val << "'" << endl;
 				}
 				else {
-					cout << "There is no word before '" << searchResult->val << "'." << endl;
+					cout << "There is no word before '" << searchResult->val << "'" << endl;
 				}
 				break;
 			}
@@ -206,16 +336,16 @@ int main()
 			if (searchResult) {
 				cout << "Your word was '" << searchResult->val << "'. ";
 				if (searchResult->next) {
-					cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
+					cout << "The next word would be '" << searchResult->next->val << "'" << endl;
 				}
 				else {
-					cout << "There is no word following '" << searchResult->val << "'." << endl;
+					cout << "There is no word following '" << searchResult->val << "'" << endl;
 				}
 				if (searchResult->prev) {
-					cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
+					cout << "The previous word would be '" << searchResult->prev->val << "'" << endl;
 				}
 				else {
-					cout << "There is no word before '" << searchResult->val << "'." << endl;
+					cout << "There is no word before '" << searchResult->val << "'" << endl;
 				}
 				break;
 			}
@@ -224,24 +354,24 @@ int main()
 				cout << "Inserted!" << endl;
 				LinkedListNode* insertionPoint = InsertNode(head, toSearch);
 				if (insertionPoint->next) {
-					cout << "The next word would be '" << insertionPoint->next->val << "'." << endl;
+					cout << "The next word would be '" << insertionPoint->next->val << "'" << endl;
 				}
 				else {
-					cout << "There is no word following '" << insertionPoint->val << "'." << endl;
+					cout << "There is no word following '" << insertionPoint->val << "'" << endl;
 				}
 				if (insertionPoint->prev) {
-					cout << "The previous word would be '" << insertionPoint->prev->val << "'." << endl;
+					cout << "The previous word would be '" << insertionPoint->prev->val << "'" << endl;
 				}
 				else {
 					head = insertionPoint;
-					cout << "There is no word before '" << insertionPoint->val << "'." << endl;
+					cout << "There is no word before '" << insertionPoint->val << "'" << endl;
 				}
 				break;
 			}
 		}
 		case 4: {
 			string toSearch;
-			cout << "Enter a word to find and delete in the chosen Dictionary:";
+			cout << "Enter a word to delete from the chosen Dictionary:";
 			cin >> toSearch;
 
 			LinkedListNode* searchResult = LinearSearch(head, toSearch);
@@ -249,11 +379,51 @@ int main()
 			break;
 		}
 		case 5: {
-			cout << "Coming soon!" << endl;
+			cout << "Enter a word to search for in the chosen Dictionary: ";
+			string firstWord;
+			cin >> firstWord;
+			LinkedListNode* searchResult = nullptr;
+			searchResult = LinearSearch(head, firstWord);
+			if (!searchResult) {
+				cout << "Your word was '" << firstWord << "'. We did not find your word." << endl;
+				cout << "Can't swap - word not found!" << endl;
+				break;
+			}
+			PrintNodeWithNextAndPrev(searchResult);
+
+			cout << "Enter a word to search for in the chosen Dictionary: ";
+			string secondWord;
+			cin >> secondWord;
+			LinkedListNode* searchResult2 = nullptr;
+			searchResult2 = LinearSearch(head, secondWord);
+			if (!searchResult2) {
+				cout << "Your word was '" << secondWord << "'. We did not find your word." << endl;
+				cout << "Can't swap - word not found!" << endl;
+				break;
+			}
+			PrintNodeWithNextAndPrev(searchResult2);
+
+			if (searchResult != searchResult2) {
+				cout << "Words '" << searchResult->val << "' and '" << searchResult2->val << "' have been swapped!";
+				if (searchResult->prev == nullptr || searchResult2->prev == nullptr) {
+					head = SwapNodes(searchResult, searchResult2);
+				}
+				else {
+					SwapNodes(searchResult, searchResult2);
+				}
+			}
+			else {
+				cout << "Hey! Those are the same word!";
+			}
+
+
+
 			break;
 		}
 		case 6: {
-			cout << "Coming soon!" << endl;
+			cout << "sorting..." << endl;
+			head = SelectionSort(head);
+			cout << "          ...Done!" << endl;
 			break;
 		}
 		case 7: {
@@ -269,59 +439,12 @@ int main()
 			break;
 		}
 		default:
-			//cout << "Please enter a valid number";
 			break;
 		}
 
 	}
 
 
-	//string toSearch;
-	//cout << "Enter a word to search for in the chosen Dictionary:";
-	//cin >> toSearch;
-
-	//LinkedListNode* searchResult = LinearSearch(head, toSearch);
-
-	//if (searchResult) {
-	//	cout << "Your word was '" << searchResult->val << "'. ";
-	//	if (searchResult->next) {
-	//		cout << "The next word would be '" << searchResult->next->val << "'. " << endl;
-	//	}
-	//	else {
-	//		cout << "There is no word following '" << searchResult->val << "'." << endl;
-	//	}
-	//	if (searchResult->prev) {
-	//		cout << "The previous word would be '" << searchResult->prev->val << "'." << endl;
-	//	}
-	//	else {
-	//		cout << "There is no word before '" << searchResult->val << "'." << endl;
-	//	}
-	//}
-	//else {
-	//	cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
-	//	cout << "Inserted!" << endl;
-	//	LinkedListNode* insertionPoint = InsertNode(head, toSearch);
-	//	if (insertionPoint->next) {
-	//		cout << "The next word would be '" << insertionPoint->next->val << "'." << endl;
-	//	}
-	//	else {
-	//		cout << "There is no word following '" << insertionPoint->val << "'." << endl;
-	//	}
-	//	if (insertionPoint->prev) {
-	//		cout << "The previous word would be '" << insertionPoint->prev->val << "'." << endl;
-	//	}
-	//	else {
-	//		head = insertionPoint;
-	//		cout << "There is no word before '" << insertionPoint->val << "'." << endl;
-	//	}
-	//}
-
-	//cout << "Enter a word to delete from the chosen Dictionary: " << endl;
-	//string wordToDelete;
-	//cin >> wordToDelete;
-	//head = DeleteNode(head, wordToDelete);
-
-	//PrintLinked(head);
 	cout << "Thank you! Bye!" << endl;
 
 	return 0;
@@ -336,48 +459,24 @@ int main()
 /* Note: not all versions of C++ support direct definition of a vector, hence a *
  * temporary array is used here.                                                *
  */
-vector<string> fillVector(int choice) {
+vector<string> fillVector(string fileName) {
 	vector<string> dict;
-
-	string temp1[] = { "airy", "aisle", "aisles", "ajar", "akimbo", "akin", "juveniles",
-					"juxtapose", "knowledges", "known", "president", "tries", "trifle",
-					"tugs", "wrongdoers", "wroth", "wyvern", "xenophon", "xylol", "yodle",
-					"yurt", "zeugma", "ziggurat", "zootomy" };
-	unsigned int size1 = 24;
-	string temp2[] = { "aback", "abased", "acknowledgers", "administers", "affair",
-					"aforementioned", "aggrieving", "agitating", "agree", "airlines", "ajar",
-					"basin", "bawdy", "cheap", "cheated", "examiner", "excel",
-					"lewdness", "liberal", "mathematician", "ordered", "president", "sandwich",
-					"swagger", "swarm", "vomit", "yell", "zero", "zodiac", "zoo" };
-	unsigned int size2 = 30;
-	string temp3[] = { "ajar", "anachronism", "bleed", "bystander", "chariot", "clay",
-					"contrive", "critiques", "databases", "derivative", "dog", "earthenware",
-					"basin", "bawdy", "cheap", "cheated", "examiner", "excel",
-					"echo", "fatiguing", "floppy", "goldsmith", "halt", "implies",
-					"jam", "klutz", "lively", "malt", "meteor", "nonsense", "orphans",
-					"paint", "playful", "railroad", "revolt", "shark", "spook", "syntax",
-					"tablet", "thing", "ugly", "vigilant", "whirr", "yell", "zap", "zoo" };
-	unsigned int size3 = 46;
-	switch (choice) {
-	case 1:
-		for (unsigned int i = 0; i < size1; i++) {
-			dict.push_back(temp1[i]);
+	ifstream inputFileStream(fileName);
+	if (!inputFileStream.bad()) {
+		while (!inputFileStream.eof()) {
+			string currentWord;
+			inputFileStream >> currentWord;
+			dict.push_back(currentWord);
 		}
-		break;
-	case 2:
-		for (unsigned int i = 0; i < size2; i++) {
-			dict.push_back(temp2[i]);
-		}
-		break;
-	default:
-		for (unsigned int i = 0; i < size3; i++) {
-			dict.push_back(temp3[i]);
-		}
-	}//end switch
-
-
+	}
+	else {
+		cout << "Bad";
+	}
+	inputFileStream.close();
 	return dict;
-} //end fillVector()
+}
+
+
 
 
 
