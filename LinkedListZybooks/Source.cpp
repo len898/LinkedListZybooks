@@ -23,7 +23,7 @@
 
 #define NEW_DICT_FILE "Updated Dictionary.txt"
 #define NEW_DICT_FILE_TWO "Updated Dictionary2.txt"
-#define NEW_DICT_FILE_THREE "Updates Dictionary3.txt"
+#define NEW_DICT_FILE_THREE "Updated Dictionary3.txt"
 
  //const std::string FILE_ONE_ = std::string(FILE_ONE);
 
@@ -240,7 +240,25 @@ LinkedListNode* SelectionSort(LinkedListNode* head) {
 }
 
 void WriteToFile(LinkedListNode* head, string fileName) {
-
+	ifstream inputStream(fileName);
+	if (inputStream.is_open()) {
+		cout << "Writing to file ..." << endl;
+		cout << "Error! File '" << fileName << "' already exists.";
+		inputStream.close();
+	}
+	else {
+		cout << "Writing to file ..." << endl;
+		inputStream.close();
+		ofstream outputStream(fileName);
+		LinkedListNode* iteratorNode = head;
+		while (iteratorNode != nullptr) {
+			string currWord = iteratorNode->val;
+			outputStream << currWord;
+			iteratorNode = iteratorNode->next;
+		}
+		cout << "                         ...Done!";
+		outputStream.close();
+	}
 }
 
 
@@ -435,7 +453,15 @@ int main()
 			break;
 		}
 		case 9: {
-			cout << "Coming soon!" << endl;
+			if (dictNum == 1) {
+				WriteToFile(head, NEW_DICT_FILE);
+			}
+			else if (dictNum == 2) {
+				WriteToFile(head, NEW_DICT_FILE_TWO);
+			}
+			else {
+				WriteToFile(head, NEW_DICT_FILE_THREE);
+			}
 			break;
 		}
 		default:
