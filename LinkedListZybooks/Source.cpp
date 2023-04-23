@@ -17,13 +17,15 @@
 #include <fstream>
 #include <string>
 
-#define FILE_ONE "short_dict.txt"
+#define FILE_ONE "short_dict1.txt"
 #define FILE_TWO "short_dict2.txt"
 #define FILE_THREE "short_dict3.txt"
 
 #define NEW_DICT_FILE "Updated Dictionary.txt"
 #define NEW_DICT_FILE_TWO "Updated Dictionary2.txt"
 #define NEW_DICT_FILE_THREE "Updated Dictionary3.txt"
+
+#define FILE_SUFFIX ".txt"
 
  //const std::string FILE_ONE_ = std::string(FILE_ONE);
 
@@ -208,32 +210,32 @@ LinkedListNode* findMin(LinkedListNode* start) {
 LinkedListNode* SelectionSort(LinkedListNode* head) {
 	LinkedListNode* sortedHead = head;
 	LinkedListNode* sortedTail = sortedHead;
-	int swaps = 0;
-	int count = 0;
+	//int swaps = 0;
+	//int count = 0;
 
 	LinkedListNode* initialMin = findMin(sortedHead);
 	if (initialMin != sortedHead) {
-		count++;
+		//count++;
 		sortedHead = SwapNodes(sortedHead, initialMin);
-		swaps++;
-		cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
-		PrintLinked(sortedHead);
+		//swaps++;
+		//cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
+		//PrintLinked(sortedHead);
 	}
 	else {
-		count++;
-		cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
-		PrintLinked(sortedHead);
+		//count++;
+		//cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
+		//PrintLinked(sortedHead);
 	}
 	sortedTail = sortedHead->next;
 
 	while (sortedTail != nullptr) {
-		count++;
+		//count++;
 		if (findMin(sortedTail)->val < sortedTail->val) {
-			swaps++;
+			//swaps++;
 			sortedTail = SwapNodes(sortedTail, findMin(sortedTail));
 		}
-		cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
-		PrintLinked(sortedHead);
+		//cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
+		//PrintLinked(sortedHead);
 		sortedTail = sortedTail->next;
 	}
 	return sortedHead;
@@ -278,6 +280,7 @@ int main()
 		for (i = 1; i < toFill.size(); i++) {
 			tail = AddNode(toFill.at(i), tail);
 		}
+		cout << "Dictionary 1 is open." << endl;
 	}
 	else if (dictNum == 2) {
 		unsigned int i = 0;
@@ -287,6 +290,7 @@ int main()
 		for (i = 1; i < toFill.size(); i++) {
 			tail = AddNode(toFill.at(i), tail);
 		}
+		cout << "Dictionary 2 is open." << endl;
 	}
 	else if (dictNum == 3) {
 		unsigned int i = 0;
@@ -296,26 +300,34 @@ int main()
 		for (i = 1; i < toFill.size(); i++) {
 			tail = AddNode(toFill.at(i), tail);
 		}
+		cout << "Dictionary 3 is open." << endl;
 	}
 	int menuChoice = -1;
 	while (menuChoice != 0) {
 		cout << "\n--------------------------------------------\n"
 			<< "Options menu: \n"
-			<< "(1) Print words\n"
-			<< "(2) Find a word\n"
-			<< "(3) Find word, insert if found (assumes words are sorted alphabetically)\n"
-			<< "(4) Find word, delete if found \n"
-			<< "(5) Swap two words\n"
-			<< "(6) Sort words (Bubble Sort or Selection Sort)\n"
-			<< "(7) Find a word - Binary Search (assumes words are sorted alphabetically)\n"
-			<< "(8) Merge two dictionaries (will sort first)\n"
-			<< "(9) Write current dictionary to file\n"
-			<< "Enter a number from 1 to 9, or 0 to exit: ";
+			<< " (1) Print words\n"
+			<< " (2) Find a word\n"
+			<< " (3) Find word, insert if not found (assumes words are sorted alphabetically)\n"
+			<< " (4) Find word, delete if found \n"
+			<< " (5) Swap two words\n"
+			<< " (6) Sort words (Bubble Sort or Selection Sort)\n"
+			<< " (7) Find a word - Binary Search (assumes words are sorted alphabetically)\n"
+			<< " (8) Merge two dictionaries (will sort first)\n"
+			<< " (9) Sort words (Merge Sort)\n"
+			<< "(10) Sort words (Bucket Sort)\n"
+			<< "(11) Load a dictionary (closes current dictionary)\n"
+			<< "(12) Write current dictionary to file\n"
+			<< "Enter a number from 1 to 12, or 0 to exit: ";
 
 		cin >> menuChoice;
 
 		switch (menuChoice)
 		{
+		case 0: {
+			cout << "Thank you! Bye!" << endl;
+			break;
+		}
 		case 1: {
 			PrintLinked(head);
 			break;
@@ -392,7 +404,7 @@ int main()
 			cout << "Enter a word to delete from the chosen Dictionary:";
 			cin >> toSearch;
 
-			LinkedListNode* searchResult = LinearSearch(head, toSearch);
+			//LinkedListNode* searchResult = LinearSearch(head, toSearch);
 			head = DeleteNode(head, toSearch);
 			break;
 		}
@@ -433,9 +445,6 @@ int main()
 			else {
 				cout << "Hey! Those are the same word!";
 			}
-
-
-
 			break;
 		}
 		case 6: {
@@ -464,14 +473,29 @@ int main()
 			}
 			break;
 		}
+		case 10: {
+			cout << "Coming soon!" << endl;
+			break;
+		}
+		case 11: {
+			cout << "Coming soon!" << endl;
+		}
+		case 12: {
+			string fileName;
+			cout << "Enter name of file (.txt will be appended automatically):";
+			cin >> fileName;
+			WriteToFile(head, fileName + FILE_SUFFIX);
+			break;
+		}
 		default:
+			cout << "Error! Input must be a number between 1 and 12, or 0 to exit." << endl;
 			break;
 		}
 
 	}
 
 
-	cout << "Thank you! Bye!" << endl;
+	//cout << "Thank you! Bye!" << endl;
 
 	return 0;
 } // end main ()
@@ -488,7 +512,7 @@ int main()
 vector<string> fillVector(string fileName) {
 	vector<string> dict;
 	ifstream inputFileStream(fileName);
-	if (!inputFileStream.bad()) {
+	if (inputFileStream.good()) {
 		while (!inputFileStream.eof()) {
 			string currentWord;
 			inputFileStream >> currentWord;
