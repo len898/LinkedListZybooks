@@ -27,6 +27,9 @@
 
 #define FILE_SUFFIX ".txt"
 
+#define FILE_NAME "dictionary"
+#define MAX_DICTIONARY_NUM "\"3\""
+
  //const std::string FILE_ONE_ = std::string(FILE_ONE);
 
 using namespace std;
@@ -207,37 +210,67 @@ LinkedListNode* findMin(LinkedListNode* start) {
 	return minNode;
 }
 
-LinkedListNode* SelectionSort(LinkedListNode* head) {
+LinkedListNode* BubbleSort(LinkedListNode* head, LinkedListNode** tail) {
+	LinkedListNode* temp = nullptr;
+	LinkedListNode* current = head;
+	LinkedListNode* headNode = head;
+	LinkedListNode* swappedVal = nullptr;
+	bool swapped = true;
+	//int swaps = 0;
+
+	//LinkedListNode* minNode = findMin(head);
+
+	if (head == nullptr) {
+		return head;
+	}
+
+	while (swapped) {
+		current = headNode;
+		swapped = false;
+		while (current != nullptr && current->next != nullptr) {
+			if (current->val > current->next->val) {
+				swappedVal = SwapNodes(current, current->next);
+				//swaps++;
+				//cout << swaps << endl;
+
+				if (swappedVal->prev == nullptr) {
+					//PrintLinked(head);
+
+					headNode = swappedVal;
+				}
+				swapped = true;
+			}
+			current = current->next;
+		}
+		temp = current;
+
+	}
+	*tail = temp;
+	return headNode;
+}
+
+LinkedListNode* SelectionSort(LinkedListNode* head, LinkedListNode** tail) {
 	LinkedListNode* sortedHead = head;
 	LinkedListNode* sortedTail = sortedHead;
-	//int swaps = 0;
-	//int count = 0;
+
 
 	LinkedListNode* initialMin = findMin(sortedHead);
 	if (initialMin != sortedHead) {
-		//count++;
+
 		sortedHead = SwapNodes(sortedHead, initialMin);
-		//swaps++;
-		//cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
-		//PrintLinked(sortedHead);
 	}
-	else {
-		//count++;
-		//cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
-		//PrintLinked(sortedHead);
-	}
+
 	sortedTail = sortedHead->next;
 
-	while (sortedTail != nullptr) {
-		//count++;
-		if (findMin(sortedTail)->val < sortedTail->val) {
+	while (sortedTail->next != nullptr) {
+		LinkedListNode* currentMin = findMin(sortedTail);
+		if (currentMin->val < sortedTail->val) {
 			//swaps++;
-			sortedTail = SwapNodes(sortedTail, findMin(sortedTail));
+			sortedTail = SwapNodes(sortedTail, currentMin);
 		}
-		//cout << "***total swaps = " << swaps << ", count = " << count << " ***" << endl;
-		//PrintLinked(sortedHead);
 		sortedTail = sortedTail->next;
 	}
+	*tail = sortedTail;
 	return sortedHead;
 }
 
@@ -263,45 +296,83 @@ void WriteToFile(LinkedListNode* head, string fileName) {
 	}
 }
 
+void OpenDict(LinkedListNode** head, LinkedListNode** tail, string dictNum) {
+	unsigned int i = 0;
+	vector<string> toFill = fillVector(FILE_NAME + dictNum + FILE_SUFFIX);
+	*head = AddNode(toFill.at(i));
+	*tail = *head;
+	for (i = 1; i < toFill.size(); i++) {
+		*tail = AddNode(toFill.at(i), *tail);
+	}
+	cout << "Dictionary " << dictNum << " is open." << endl;
+}
+
+void DeleteList(LinkedListNode* head, LinkedListNode* tail) {
+	while (head->next) {
+		if (head->prev) {
+			delete head->prev;
+		}
+		head = head->next;
+	}
+	head = nullptr;
+	tail = nullptr;
+}
+
+LinkedListNode* FindMidpoint(LinkedListNode* head, LinkedListNode* tail) {
+	LinkedListNode* slow = head;
+	LinkedListNode* fast = head;
+
+	while (fast != tail && fast->next != tail) {
+		fast = fast->next->next;
+		slow = slow->next;
+	}
+	return slow;
+}
+
+LinkedListNode* BinarySearch(LinkedListNode* head, LinkedListNode* tail, string target) {
+	LinkedListNode* searchHead = head;
+	LinkedListNode* searchTail = tail;
+	LinkedListNode* searchMid = FindMidpoint(head, tail);
+	while (searchHead->val < searchTail->val && searchHead->next != searchTail->prev) {
+		cout << "start: " << searchHead->val << ", mid: " << searchMid->val << ", end: " << searchTail->val << endl;
+		if (target == searchHead->val) {
+			PrintNodeWithNextAndPrev(searchHead);
+			return searchHead;
+		}
+		else if (target == searchMid->val) {
+			PrintNodeWithNextAndPrev(searchMid);
+			return searchMid;
+		}
+		else if (target == searchTail->val) {
+			PrintNodeWithNextAndPrev(searchTail);
+			return searchTail;
+		}
+		if (target < searchMid->val) {
+			searchHead = searchHead->next;
+			searchTail = searchMid->prev;
+			searchMid = FindMidpoint(searchHead, searchTail);
+		}
+		else if (target > searchMid->val) {
+			searchHead = searchMid->next;
+			searchTail = searchTail->prev;
+			searchMid = FindMidpoint(searchHead, searchTail);
+		}
+	}
+	cout << "start: " << searchHead->val << ", mid: " << searchMid->val << ", end: " << searchTail->val << endl;
+	cout << "Your word was '" << target << "'. We did not find your word." << endl;
+	return nullptr;
+}
 
 
 int main()
 {
 	int dictNum;
-	cout << "Which Dictionary should be opened? Enter \"1\", \"2\", or \"3\":";
+	cout << "Which Dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << ":";
 	cin >> dictNum;
-	LinkedListNode* head = NULL;
-	LinkedListNode* tail = NULL;
-	if (dictNum == 1) {
-		unsigned int i = 0;
-		vector<string> toFill = fillVector(FILE_ONE);
-		head = AddNode(toFill.at(i));
-		tail = head;
-		for (i = 1; i < toFill.size(); i++) {
-			tail = AddNode(toFill.at(i), tail);
-		}
-		cout << "Dictionary 1 is open." << endl;
-	}
-	else if (dictNum == 2) {
-		unsigned int i = 0;
-		vector<string> toFill = fillVector(FILE_TWO);
-		head = AddNode(toFill.at(i));
-		tail = head;
-		for (i = 1; i < toFill.size(); i++) {
-			tail = AddNode(toFill.at(i), tail);
-		}
-		cout << "Dictionary 2 is open." << endl;
-	}
-	else if (dictNum == 3) {
-		unsigned int i = 0;
-		vector<string> toFill = fillVector(FILE_THREE);
-		head = AddNode(toFill.at(i));
-		tail = head;
-		for (i = 1; i < toFill.size(); i++) {
-			tail = AddNode(toFill.at(i), tail);
-		}
-		cout << "Dictionary 3 is open." << endl;
-	}
+	LinkedListNode* head = nullptr;
+	LinkedListNode* tail = nullptr;
+	OpenDict(&head, &tail, std::to_string(dictNum));
+
 	int menuChoice = -1;
 	while (menuChoice != 0) {
 		cout << "\n--------------------------------------------\n"
@@ -338,25 +409,12 @@ int main()
 			cin >> toSearch;
 			LinkedListNode* searchResult = LinearSearch(head, toSearch);
 			if (searchResult) {
-				cout << "Your word was '" << searchResult->val << "'. ";
-				if (searchResult->next) {
-					cout << "The next word would be '" << searchResult->next->val << "'" << endl;
-				}
-				else {
-					cout << "There is no word following '" << searchResult->val << "'" << endl;
-				}
-				if (searchResult->prev) {
-					cout << "The previous word would be '" << searchResult->prev->val << "'" << endl;
-				}
-				else {
-					cout << "There is no word before '" << searchResult->val << "'" << endl;
-				}
-				break;
+				PrintNodeWithNextAndPrev(searchResult);
 			}
 			else {
 				cout << "Your word was '" << toSearch << "'. We did not find your word." << endl;
-				break;
 			}
+			break;
 		}
 		case 3: {
 			string toSearch;
@@ -364,20 +422,7 @@ int main()
 			cin >> toSearch;
 			LinkedListNode* searchResult = LinearSearch(head, toSearch);
 			if (searchResult) {
-				cout << "Your word was '" << searchResult->val << "'. ";
-				if (searchResult->next) {
-					cout << "The next word would be '" << searchResult->next->val << "'" << endl;
-				}
-				else {
-					cout << "There is no word following '" << searchResult->val << "'" << endl;
-				}
-				if (searchResult->prev) {
-					cout << "The previous word would be '" << searchResult->prev->val << "'" << endl;
-				}
-				else {
-					cout << "There is no word before '" << searchResult->val << "'" << endl;
-				}
-				break;
+				PrintNodeWithNextAndPrev(searchResult);
 			}
 			else {
 				cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
@@ -449,12 +494,16 @@ int main()
 		}
 		case 6: {
 			cout << "sorting..." << endl;
-			head = SelectionSort(head);
+			head = BubbleSort(head, &tail);
 			cout << "          ...Done!" << endl;
 			break;
 		}
 		case 7: {
-			cout << "Coming soon!" << endl;
+			head = BubbleSort(head, &tail);
+			string searchTarget;
+			cout << "Enter a word to search for in the chosen Dictionary: ";
+			cin >> searchTarget;
+			BinarySearch(head, tail, searchTarget);
 			break;
 		}
 		case 8: {
@@ -462,15 +511,7 @@ int main()
 			break;
 		}
 		case 9: {
-			if (dictNum == 1) {
-				WriteToFile(head, NEW_DICT_FILE);
-			}
-			else if (dictNum == 2) {
-				WriteToFile(head, NEW_DICT_FILE_TWO);
-			}
-			else {
-				WriteToFile(head, NEW_DICT_FILE_THREE);
-			}
+			cout << "Coming Soon!" << endl;
 			break;
 		}
 		case 10: {
@@ -478,7 +519,14 @@ int main()
 			break;
 		}
 		case 11: {
-			cout << "Coming soon!" << endl;
+			cout << "Which Dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << ": ";
+			int dictNum;
+			cin >> dictNum;
+			DeleteList(head, tail);
+			head = nullptr;
+			tail = nullptr;
+			OpenDict(&head, &tail, std::to_string(dictNum));
+			break;
 		}
 		case 12: {
 			string fileName;
@@ -495,7 +543,6 @@ int main()
 	}
 
 
-	//cout << "Thank you! Bye!" << endl;
 
 	return 0;
 } // end main ()
