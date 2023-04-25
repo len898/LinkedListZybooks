@@ -28,7 +28,7 @@
 #define FILE_SUFFIX ".txt"
 
 #define FILE_NAME "dictionary"
-#define MAX_DICTIONARY_NUM "\"3\""
+#define MAX_DICTIONARY_NUM "\"9\""
 
  //const std::string FILE_ONE_ = std::string(FILE_ONE);
 
@@ -93,7 +93,7 @@ LinkedListNode* FindInsertionPoint(LinkedListNode* head, string word) {
 	return iterator;
 }
 
-LinkedListNode* InsertNode(LinkedListNode* head, string word) {
+LinkedListNode* InsertNewNode(LinkedListNode* head, string word) {
 	LinkedListNode* nodeBeforeInsert = FindInsertionPoint(head, word);
 	if (nodeBeforeInsert == head) {
 		LinkedListNode* newNode = new LinkedListNode(word, nullptr, nodeBeforeInsert);
@@ -108,6 +108,7 @@ LinkedListNode* InsertNode(LinkedListNode* head, string word) {
 	nodeBeforeInsert->next = newNode;
 	return newNode;
 }
+
 
 LinkedListNode* DeleteNode(LinkedListNode* head, string word) {
 	LinkedListNode* DeletionNode = LinearSearch(head, word);
@@ -210,43 +211,81 @@ LinkedListNode* findMin(LinkedListNode* start) {
 	return minNode;
 }
 
+//LinkedListNode* BubbleSort(LinkedListNode* head, LinkedListNode** tail) {
+//	LinkedListNode* temp = nullptr;
+//	LinkedListNode* current = head;
+//	LinkedListNode* headNode = head;
+//	LinkedListNode* swappedVal = nullptr;
+//	bool swapped = true;
+//	//int swaps = 0;
+//
+//	//LinkedListNode* minNode = findMin(head);
+//
+//	if (head == nullptr) {
+//		return head;
+//	}
+//
+//	while (swapped) {
+//		current = headNode;
+//		swapped = false;
+//		while (current != nullptr && current->next != nullptr) {
+//			if (current->val > current->next->val) {
+//				swappedVal = SwapNodes(current, current->next);
+//				//swaps++;
+//				//cout << swaps << endl;
+//
+//				if (swappedVal->prev == nullptr) {
+//					PrintLinked(head);
+//					headNode = swappedVal;
+//				}
+//				swapped = true;
+//			}
+//			current = current->next;
+//		}
+//		temp = current;
+//
+//	}
+//	*tail = temp;
+//	return headNode;
+//}
+
 LinkedListNode* BubbleSort(LinkedListNode* head, LinkedListNode** tail) {
-	LinkedListNode* temp = nullptr;
-	LinkedListNode* current = head;
-	LinkedListNode* headNode = head;
-	LinkedListNode* swappedVal = nullptr;
-	bool swapped = true;
-	//int swaps = 0;
-
-	//LinkedListNode* minNode = findMin(head);
-
-	if (head == nullptr) {
+	if (head->next == nullptr) {
+		return head;
+	}
+	if (head->next->next == nullptr && head->val < head->next->val) {
+		return head;
+	}
+	else if (head->next->next == nullptr && head->val > head->next->val) {
+		head = SwapNodes(head, head->next);
 		return head;
 	}
 
+	LinkedListNode* listIterator = head;
+	LinkedListNode* newListHead = head;
+	bool swapped = true;
+
 	while (swapped) {
-		current = headNode;
 		swapped = false;
-		while (current != nullptr && current->next != nullptr) {
-			if (current->val > current->next->val) {
-				swappedVal = SwapNodes(current, current->next);
-				//swaps++;
-				//cout << swaps << endl;
-
-				if (swappedVal->prev == nullptr) {
-					//PrintLinked(head);
-
-					headNode = swappedVal;
-				}
+		while (listIterator && listIterator->next) {
+			if (listIterator->val > listIterator->next->val) {
+				LinkedListNode* swapNode = SwapNodes(listIterator, listIterator->next);
 				swapped = true;
+				if (swapNode->prev == nullptr) {
+					newListHead = swapNode;
+				}
 			}
-			current = current->next;
+			if (listIterator->next == nullptr) {
+				*tail = listIterator;
+			}
+			listIterator = listIterator->next;
 		}
-		temp = current;
-
+		//*tail = listIterator;
+		listIterator = newListHead;
 	}
-	*tail = temp;
-	return headNode;
+	//cout << "Tail: " << (*tail)->val << endl;
+	return newListHead;
+
 }
 
 LinkedListNode* SelectionSort(LinkedListNode* head, LinkedListNode** tail) {
@@ -363,6 +402,63 @@ LinkedListNode* BinarySearch(LinkedListNode* head, LinkedListNode* tail, string 
 	return nullptr;
 }
 
+LinkedListNode* InsertNode(LinkedListNode* previous, LinkedListNode* inserter) {
+	LinkedListNode* tempForward = previous->next;
+	previous->next = inserter;
+	inserter->prev = previous;
+	inserter->next = tempForward;
+	tempForward->prev = inserter;
+	tempForward = nullptr;
+	return inserter;
+}
+
+LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
+	if (head1->val < head2->val) {
+		LinkedListNode* headToReturn = head1;
+		LinkedListNode* list1Iterator = head1->next;
+		LinkedListNode* list2Iterator = head2;
+
+		while (list1Iterator->next && list2Iterator) {
+			if (list2Iterator->val < list1Iterator->val) {
+				LinkedListNode* temp = list2Iterator->next;
+				list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
+				list2Iterator = temp;
+				if (list2Iterator) {
+					list2Iterator->prev = nullptr;
+				}
+				else {
+					return head1;
+				}
+			}
+			else if (list2Iterator->val == list1Iterator->val) {
+				if (list2Iterator->next) {
+					LinkedListNode* temp = list2Iterator->next;
+					delete temp->prev;
+					list2Iterator = temp;
+				}
+				else {
+					delete list2Iterator;
+					list2Iterator = nullptr;
+				}
+			}
+			list1Iterator = list1Iterator->next;
+		}
+		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
+			list1Iterator->next = list2Iterator;
+			list2Iterator->prev = list1Iterator;
+		}
+		else {
+			list1Iterator->next = list2Iterator->next;
+			list2Iterator->next->prev = list1Iterator;
+			delete list2Iterator;
+		}
+		return head1;
+	}
+	else {
+		return nullptr;
+	}
+}
+
 
 int main()
 {
@@ -427,7 +523,7 @@ int main()
 			else {
 				cout << "Your word was '" << toSearch << "'. We did not find your word." << " Adding word to dictionary...";
 				cout << "Inserted!" << endl;
-				LinkedListNode* insertionPoint = InsertNode(head, toSearch);
+				LinkedListNode* insertionPoint = InsertNewNode(head, toSearch);
 				if (insertionPoint->next) {
 					cout << "The next word would be '" << insertionPoint->next->val << "'" << endl;
 				}
@@ -507,7 +603,27 @@ int main()
 			break;
 		}
 		case 8: {
-			cout << "Coming soon!" << endl;
+			int secondDictNum;
+
+			cout << "Which dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << endl;
+			cin >> secondDictNum;
+
+			while (secondDictNum == dictNum) {
+				cout << "That dictionary is already open! Pick another." << endl;
+				cout << "Which dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << endl;
+				cin >> secondDictNum;
+			}
+
+			LinkedListNode* listTwoHead;
+			LinkedListNode* listTwoTail;
+
+			OpenDict(&listTwoHead, &listTwoTail, std::to_string(secondDictNum));
+			listTwoHead = BubbleSort(listTwoHead, &listTwoTail);
+			//PrintLinked(listTwoHead);
+
+			head = MergeLists(head, listTwoHead);
+			PrintLinked(head);
+
 			break;
 		}
 		case 9: {
@@ -541,9 +657,6 @@ int main()
 		}
 
 	}
-
-
-
 	return 0;
 } // end main ()
 
