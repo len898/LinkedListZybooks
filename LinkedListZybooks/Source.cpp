@@ -414,7 +414,7 @@ LinkedListNode* InsertNode(LinkedListNode* previous, LinkedListNode* inserter) {
 
 LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 	if (head1->val < head2->val) {
-		LinkedListNode* headToReturn = head1;
+		//LinkedListNode* headToReturn = head1;
 		LinkedListNode* list1Iterator = head1->next;
 		LinkedListNode* list2Iterator = head2;
 
@@ -447,15 +447,102 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 			list1Iterator->next = list2Iterator;
 			list2Iterator->prev = list1Iterator;
 		}
-		else {
+		else if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
 			list1Iterator->next = list2Iterator->next;
-			list2Iterator->next->prev = list1Iterator;
+			if (list2Iterator->next) {
+				list2Iterator->next->prev = list1Iterator;
+
+			}
 			delete list2Iterator;
 		}
 		return head1;
 	}
+	else if (head2->val < head1->val) {
+		//LinkedListNode* headToReturn = head2;
+		LinkedListNode* list1Iterator = head2->next;
+		LinkedListNode* list2Iterator = head1;
+
+		while (list1Iterator->next && list2Iterator) {
+			if (list2Iterator->val < list1Iterator->val) {
+				LinkedListNode* temp = list2Iterator->next;
+				list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
+				list2Iterator = temp;
+				if (list2Iterator) {
+					list2Iterator->prev = nullptr;
+				}
+				else {
+					return head2;
+				}
+			}
+			else if (list2Iterator->val == list1Iterator->val) {
+				if (list2Iterator->next) {
+					LinkedListNode* temp = list2Iterator->next;
+					delete temp->prev;
+					list2Iterator = temp;
+				}
+				else {
+					delete list2Iterator;
+					list2Iterator = nullptr;
+				}
+			}
+			list1Iterator = list1Iterator->next;
+		}
+		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
+			list1Iterator->next = list2Iterator;
+			list2Iterator->prev = list1Iterator;
+		}
+		else {
+			list1Iterator->next = list2Iterator->next;
+			if (list2Iterator->next) {
+				list2Iterator->next->prev = list1Iterator;
+			}
+			delete list2Iterator;
+		}
+		return head2;
+	}
 	else {
-		return nullptr;
+		//LinkedListNode* headToReturn = head1;
+		LinkedListNode* list1Iterator = head1->next;
+		LinkedListNode* list2Iterator = head2->next;
+		delete list2Iterator->prev;
+
+		while (list1Iterator->next && list2Iterator) {
+			if (list2Iterator->val < list1Iterator->val) {
+				LinkedListNode* temp = list2Iterator->next;
+				list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
+				list2Iterator = temp;
+				if (list2Iterator) {
+					list2Iterator->prev = nullptr;
+				}
+				else {
+					return head1;
+				}
+			}
+			else if (list2Iterator->val == list1Iterator->val) {
+				if (list2Iterator->next) {
+					LinkedListNode* temp = list2Iterator->next;
+					delete temp->prev;
+					list2Iterator = temp;
+				}
+				else {
+					delete list2Iterator;
+					list2Iterator = nullptr;
+				}
+			}
+			list1Iterator = list1Iterator->next;
+		}
+		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
+			list1Iterator->next = list2Iterator;
+			list2Iterator->prev = list1Iterator;
+		}
+		else {
+			list1Iterator->next = list2Iterator->next;
+			if (list2Iterator->next) {
+				list2Iterator->next->prev = list1Iterator;
+			}
+			delete list2Iterator;
+		}
+		return head1;
 	}
 }
 
@@ -605,12 +692,12 @@ int main()
 		case 8: {
 			int secondDictNum;
 
-			cout << "Which dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << endl;
+			cout << "Which dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << ":" << endl;
 			cin >> secondDictNum;
 
 			while (secondDictNum == dictNum) {
 				cout << "That dictionary is already open! Pick another." << endl;
-				cout << "Which dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << endl;
+				cout << "Which dictionary should be opened? Enter a number between \"1\" and " << MAX_DICTIONARY_NUM << ":" << endl;
 				cin >> secondDictNum;
 			}
 
@@ -618,12 +705,12 @@ int main()
 			LinkedListNode* listTwoTail;
 
 			OpenDict(&listTwoHead, &listTwoTail, std::to_string(secondDictNum));
+			head = BubbleSort(head, &tail);
 			listTwoHead = BubbleSort(listTwoHead, &listTwoTail);
-			//PrintLinked(listTwoHead);
-
+			cout << "Sorting..." << endl;
+			cout << "Merging..." << endl;
 			head = MergeLists(head, listTwoHead);
-			PrintLinked(head);
-
+			cout << "...Done!" << endl;
 			break;
 		}
 		case 9: {
