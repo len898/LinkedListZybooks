@@ -84,7 +84,10 @@ LinkedListNode* FindInsertionPoint(LinkedListNode* head, string word) {
 	if (head->val > word) {
 		return head;
 	}
-	while (iterator->next) {
+	while (iterator != nullptr && iterator->next) {
+		if (iterator->val == word) {
+			return iterator;
+		}
 		if (iterator->val < word && iterator->next->val > word) {
 			return iterator;
 		}
@@ -402,155 +405,164 @@ LinkedListNode* BinarySearch(LinkedListNode* head, LinkedListNode* tail, string 
 	return nullptr;
 }
 
-LinkedListNode* InsertNode(LinkedListNode* previous, LinkedListNode* inserter) {
-	LinkedListNode* tempForward = previous->next;
-	previous->next = inserter;
-	inserter->prev = previous;
-	inserter->next = tempForward;
-	tempForward->prev = inserter;
+LinkedListNode* InsertNode(LinkedListNode* nodeBeforeInsertion, LinkedListNode* nodeToInsert) {
+	LinkedListNode* tempForward = nullptr;
+	if (!nodeBeforeInsertion->next) {
+		nodeToInsert->next = nullptr;
+		nodeToInsert->prev = nodeBeforeInsertion;
+		nodeBeforeInsertion->next = nodeToInsert;
+		return nodeToInsert;
+	}
+	if (nodeBeforeInsertion->next) {
+		tempForward = nodeBeforeInsertion->next;
+	}
+
+	nodeBeforeInsertion->next = nodeToInsert;
+	nodeToInsert->prev = nodeBeforeInsertion;
+	nodeToInsert->next = tempForward;
+	tempForward->prev = nodeToInsert;
 	tempForward = nullptr;
-	return inserter;
+	return nodeToInsert;
 }
 
 LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 	if (head1->val < head2->val) {
-		//LinkedListNode* headToReturn = head1;
-		LinkedListNode* list1Iterator = head1;
-		LinkedListNode* list2Iterator = head2;
+		////LinkedListNode* headToReturn = head1;
+		//LinkedListNode* list1Iterator = head1;
+		//LinkedListNode* list2Iterator = head2;
 
-		while (list1Iterator->next && list2Iterator) {
-			if (list2Iterator->val < list1Iterator->val) {
-				LinkedListNode* temp = list2Iterator->next;
-				list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
-				list2Iterator = temp;
-				if (list2Iterator) {
-					list2Iterator->prev = nullptr;
+		//while (list1Iterator != nullptr && list1Iterator->next && list2Iterator) {
+		//	if (list2Iterator->val < list1Iterator->val) {
+		//		LinkedListNode* temp = list2Iterator->next;
+		//		list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
+		//		list2Iterator = temp;
+		//		if (list2Iterator) {
+		//			list2Iterator->prev = nullptr;
+		//		}
+		//		else {
+		//			return head1;
+		//		}
+		//	}
+		//	else if (list2Iterator->val == list1Iterator->val) {
+		//		if (list2Iterator->next) {
+		//			LinkedListNode* temp = list2Iterator->next;
+		//			delete temp->prev;
+		//			list2Iterator = temp;
+		//		}
+		//		else {
+		//			delete list2Iterator;
+		//			list2Iterator = nullptr;
+		//		}
+		//	}
+		//	list1Iterator = list1Iterator->next;
+		//}
+		//if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
+		//	if (list1Iterator->val < list2Iterator->val) {
+		//		list1Iterator->next = list2Iterator;
+		//		list2Iterator->prev = list1Iterator;
+		//	}
+		//	else {
+		//		list1Iterator->prev->next = list2Iterator;
+		//		list2Iterator->next = list1Iterator;
+		//		list1Iterator->prev = list2Iterator;
+		//		list1Iterator->next = nullptr;
+		//	}
+		//}
+		//return head1;
+		LinkedListNode* KeeperList = head1;
+		LinkedListNode* removeList = head2;
+
+		while (removeList != nullptr) {
+			LinkedListNode* insertionPt = FindInsertionPoint(KeeperList, removeList->val);
+			LinkedListNode* tempNode = removeList->next;
+			if (insertionPt) {
+				if (insertionPt->prev == nullptr) {
+					KeeperList = InsertNode(insertionPt, removeList);
+				}
+				else if (insertionPt->val == removeList->val) {
+					if (removeList->next) {
+						removeList = removeList->next;
+						delete removeList->prev;
+					}
+					else {
+						delete removeList;
+					}
 				}
 				else {
-					return head1;
+					InsertNode(insertionPt, removeList);
 				}
+				removeList = tempNode;
 			}
-			else if (list2Iterator->val == list1Iterator->val) {
-				if (list2Iterator->next) {
-					LinkedListNode* temp = list2Iterator->next;
-					delete temp->prev;
-					list2Iterator = temp;
-				}
-				else {
-					delete list2Iterator;
-					list2Iterator = nullptr;
-				}
+			else {
+				removeList = removeList->next;
 			}
-			list1Iterator = list1Iterator->next;
-		}
-		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
-			list1Iterator->next = list2Iterator;
-			list2Iterator->prev = list1Iterator;
-		}
-		else if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
-			list1Iterator->next = list2Iterator->next;
-			if (list2Iterator->next) {
-				list2Iterator->next->prev = list1Iterator;
-
-			}
-			delete list2Iterator;
 		}
 		return head1;
 	}
 	else if (head2->val < head1->val) {
-		//LinkedListNode* headToReturn = head2;
-		LinkedListNode* list1Iterator = head2;
-		LinkedListNode* list2Iterator = head1;
+		LinkedListNode* KeeperList = head2;
+		LinkedListNode* removeList = head1;
 
-		while (list1Iterator->next && list2Iterator) {
-			if (list2Iterator->val < list1Iterator->val) {
-				LinkedListNode* temp = list2Iterator->next;
-				list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
-				list2Iterator = temp;
-				if (list2Iterator) {
-					list2Iterator->prev = nullptr;
+		while (removeList != nullptr) {
+			LinkedListNode* insertionPt = FindInsertionPoint(KeeperList, removeList->val);
+			LinkedListNode* tempNode = removeList->next;
+			if (insertionPt) {
+				if (insertionPt->prev == nullptr) {
+					KeeperList = InsertNode(insertionPt, removeList);
+				}
+				else if (insertionPt->val == removeList->val) {
+					if (removeList->next) {
+						removeList = removeList->next;
+						delete removeList->prev;
+					}
+					else {
+						delete removeList;
+					}
 				}
 				else {
-					return head2;
+					InsertNode(insertionPt, removeList);
 				}
+				removeList = tempNode;
 			}
-			else if (list2Iterator->val == list1Iterator->val) {
-				if (list2Iterator->next) {
-					LinkedListNode* temp = list2Iterator->next;
-					delete temp->prev;
-					list2Iterator = temp;
-				}
-				else {
-					delete list2Iterator;
-					list2Iterator = nullptr;
-				}
+			else {
+				removeList = removeList->next;
 			}
-			list1Iterator = list1Iterator->next;
-		}
-		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
-			list1Iterator->next = list2Iterator;
-			list2Iterator->prev = list1Iterator;
-		}
-		else {
-			list1Iterator->next = list2Iterator->next;
-			if (list2Iterator->next) {
-				list2Iterator->next->prev = list1Iterator;
-			}
-			delete list2Iterator;
 		}
 		return head2;
 	}
 	else {
-		//LinkedListNode* headToReturn = head1;
+		LinkedListNode* KeeperList = head1;
+		LinkedListNode* removeList = head2;
 
-
-		LinkedListNode* list1Iterator = head1;
-		LinkedListNode* list2Iterator = head2;
-		delete list2Iterator->prev;
-
-		while (list1Iterator->next && list2Iterator) {
-			if (list2Iterator->val < list1Iterator->val) {
-				LinkedListNode* temp = list2Iterator->next;
-				list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
-				list2Iterator = temp;
-				if (list2Iterator) {
-					list2Iterator->prev = nullptr;
-				}
-				else {
-					return head1;
-				}
-			}
-			else if (list2Iterator->val == list1Iterator->val) {
-				if (list2Iterator->next) {
-					LinkedListNode* temp = list2Iterator->next;
-					delete temp->prev;
-					list2Iterator = temp;
-				}
-				else {
-					delete list2Iterator;
-					list2Iterator = nullptr;
-				}
-			}
-			list1Iterator = list1Iterator->next;
-		}
-		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
-			if (list1Iterator->val < list2Iterator->val) {
-				list1Iterator->next = list2Iterator;
-				list2Iterator->prev = list1Iterator;
-			}
-			else {
-				list1Iterator->prev->next = list2Iterator;
-				list2Iterator->next = list1Iterator;
-				list1Iterator->prev = list2Iterator;
-				list1Iterator->next = nullptr;
-			}
+		//Checking whether the second list only has one element, and therefore deleting and exiting
+		if (head2->next) {
+			removeList = removeList->next;
+			delete removeList->prev;
 		}
 		else {
-			list1Iterator->next = list2Iterator->next;
-			if (list2Iterator->next) {
-				list2Iterator->next->prev = list1Iterator;
+			delete head2;
+			return head1;
+		}
+
+		while (removeList != nullptr) {
+			LinkedListNode* insertionPt = FindInsertionPoint(KeeperList, removeList->val);
+			LinkedListNode* tempNode = removeList->next;
+			if (insertionPt) {
+				if (insertionPt->prev == nullptr) {
+					KeeperList = InsertNode(insertionPt, removeList);
+				}
+				else if (insertionPt->val == removeList->val) {
+					removeList = removeList->next;
+					delete removeList->prev;
+				}
+				else {
+					InsertNode(insertionPt, removeList);
+				}
+				removeList = tempNode;
 			}
-			delete list2Iterator;
+			else {
+				removeList = removeList->next;
+			}
 		}
 		return head1;
 	}
