@@ -415,7 +415,7 @@ LinkedListNode* InsertNode(LinkedListNode* previous, LinkedListNode* inserter) {
 LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 	if (head1->val < head2->val) {
 		//LinkedListNode* headToReturn = head1;
-		LinkedListNode* list1Iterator = head1->next;
+		LinkedListNode* list1Iterator = head1;
 		LinkedListNode* list2Iterator = head2;
 
 		while (list1Iterator->next && list2Iterator) {
@@ -459,7 +459,7 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 	}
 	else if (head2->val < head1->val) {
 		//LinkedListNode* headToReturn = head2;
-		LinkedListNode* list1Iterator = head2->next;
+		LinkedListNode* list1Iterator = head2;
 		LinkedListNode* list2Iterator = head1;
 
 		while (list1Iterator->next && list2Iterator) {
@@ -502,8 +502,10 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 	}
 	else {
 		//LinkedListNode* headToReturn = head1;
-		LinkedListNode* list1Iterator = head1->next;
-		LinkedListNode* list2Iterator = head2->next;
+
+
+		LinkedListNode* list1Iterator = head1;
+		LinkedListNode* list2Iterator = head2;
 		delete list2Iterator->prev;
 
 		while (list1Iterator->next && list2Iterator) {
@@ -532,8 +534,16 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 			list1Iterator = list1Iterator->next;
 		}
 		if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
-			list1Iterator->next = list2Iterator;
-			list2Iterator->prev = list1Iterator;
+			if (list1Iterator->val < list2Iterator->val) {
+				list1Iterator->next = list2Iterator;
+				list2Iterator->prev = list1Iterator;
+			}
+			else {
+				list1Iterator->prev->next = list2Iterator;
+				list2Iterator->next = list1Iterator;
+				list1Iterator->prev = list2Iterator;
+				list1Iterator->next = nullptr;
+			}
 		}
 		else {
 			list1Iterator->next = list2Iterator->next;
