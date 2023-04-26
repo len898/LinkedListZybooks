@@ -331,7 +331,7 @@ void WriteToFile(LinkedListNode* head, string fileName) {
 		LinkedListNode* iteratorNode = head;
 		while (iteratorNode != nullptr) {
 			string currWord = iteratorNode->val;
-			outputStream << currWord;
+			outputStream << currWord << "\n";
 			iteratorNode = iteratorNode->next;
 		}
 		cout << "                         ...Done!";
@@ -553,33 +553,19 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2, LinkedL
 
 
 LinkedListNode* MergeSort(LinkedListNode* head, LinkedListNode** tail) {
-
-	cout << "Start: " << head->val << " End: " << (*tail)->val << endl;
-
 	if (head == nullptr || head->next == nullptr || head == (*tail)) {
 		return head;
 	}
-	/*else if (head->next == nullptr || head == *tail) {
-		return head;
-	}*/
 	else {
 		LinkedListNode* midpoint = FindMidpoint(head, *tail);
 		LinkedListNode* temp = midpoint->next;
 		midpoint->next = nullptr;
-		//LinkedListNode* midpoint = FindMidpoint(head, *tail);
 		LinkedListNode* leftHalf = MergeSort(head, &midpoint);
 		LinkedListNode* rightHalf = MergeSort(temp, tail);
-		//PrintLinked(rightHalf);
-		//cout << "LEFT SIDE -----------------------------" << endl;
-		//PrintLinked(leftHalf);
-
-		//PrintLinked(rightHalf);
-		//cout << "-------" << endl;
 		LinkedListNode* ReturnList = MergeLists(leftHalf, rightHalf, tail, tail);
 		(*tail) = FindTail(ReturnList);
 		return ReturnList;
 	}
-	return nullptr;
 }
 
 int main()
