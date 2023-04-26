@@ -41,6 +41,7 @@ using namespace std;
  //vector<string> fillVector(int choice);
 vector<string> fillVector(string fileName);
 
+
 struct LinkedListNode
 {
 	string val;
@@ -360,7 +361,7 @@ void DeleteList(LinkedListNode* head, LinkedListNode* tail) {
 	tail = nullptr;
 }
 
-LinkedListNode* FindMidpoint(LinkedListNode* head, LinkedListNode* tail) {
+LinkedListNode* FindMidpoint(LinkedListNode* head, LinkedListNode* tail = nullptr) {
 	LinkedListNode* slow = head;
 	LinkedListNode* fast = head;
 
@@ -425,50 +426,25 @@ LinkedListNode* InsertNode(LinkedListNode* nodeBeforeInsertion, LinkedListNode* 
 	return nodeToInsert;
 }
 
-LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
-	if (head1->val < head2->val) {
-		////LinkedListNode* headToReturn = head1;
-		//LinkedListNode* list1Iterator = head1;
-		//LinkedListNode* list2Iterator = head2;
+LinkedListNode* FindTail(LinkedListNode* head) {
+	LinkedListNode* iterator = head;
 
-		//while (list1Iterator != nullptr && list1Iterator->next && list2Iterator) {
-		//	if (list2Iterator->val < list1Iterator->val) {
-		//		LinkedListNode* temp = list2Iterator->next;
-		//		list1Iterator = InsertNode(list1Iterator->prev, list2Iterator);
-		//		list2Iterator = temp;
-		//		if (list2Iterator) {
-		//			list2Iterator->prev = nullptr;
-		//		}
-		//		else {
-		//			return head1;
-		//		}
-		//	}
-		//	else if (list2Iterator->val == list1Iterator->val) {
-		//		if (list2Iterator->next) {
-		//			LinkedListNode* temp = list2Iterator->next;
-		//			delete temp->prev;
-		//			list2Iterator = temp;
-		//		}
-		//		else {
-		//			delete list2Iterator;
-		//			list2Iterator = nullptr;
-		//		}
-		//	}
-		//	list1Iterator = list1Iterator->next;
-		//}
-		//if (list2Iterator && list1Iterator && list2Iterator->val != list1Iterator->val) {
-		//	if (list1Iterator->val < list2Iterator->val) {
-		//		list1Iterator->next = list2Iterator;
-		//		list2Iterator->prev = list1Iterator;
-		//	}
-		//	else {
-		//		list1Iterator->prev->next = list2Iterator;
-		//		list2Iterator->next = list1Iterator;
-		//		list1Iterator->prev = list2Iterator;
-		//		list1Iterator->next = nullptr;
-		//	}
-		//}
-		//return head1;
+	if (head == nullptr) {
+		return nullptr;
+	}
+	else if (head->next == nullptr) {
+		return head;
+	}
+	else {
+		while (iterator->next) {
+			iterator = iterator->next;
+		}
+		return iterator;
+	}
+}
+
+LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2, LinkedListNode** tail1, LinkedListNode** tail2) {
+	if (head1->val < head2->val) {
 		LinkedListNode* KeeperList = head1;
 		LinkedListNode* removeList = head2;
 
@@ -497,6 +473,8 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 				removeList = removeList->next;
 			}
 		}
+		(*tail1) = FindTail(head1);
+
 		return head1;
 	}
 	else if (head2->val < head1->val) {
@@ -528,6 +506,8 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 				removeList = removeList->next;
 			}
 		}
+		(*tail2) = FindTail(head2);
+
 		return head2;
 	}
 	else {
@@ -541,6 +521,7 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 		}
 		else {
 			delete head2;
+			(*tail1) = FindTail(head1);
 			return head1;
 		}
 
@@ -564,10 +545,42 @@ LinkedListNode* MergeLists(LinkedListNode* head1, LinkedListNode* head2) {
 				removeList = removeList->next;
 			}
 		}
+		(*tail1) = FindTail(head1);
 		return head1;
 	}
 }
 
+
+
+LinkedListNode* MergeSort(LinkedListNode* head, LinkedListNode** tail) {
+
+	cout << "Start: " << head->val << " End: " << (*tail)->val << endl;
+
+	if (head == nullptr || head->next == nullptr || head == (*tail)) {
+		return head;
+	}
+	/*else if (head->next == nullptr || head == *tail) {
+		return head;
+	}*/
+	else {
+		LinkedListNode* midpoint = FindMidpoint(head, *tail);
+		LinkedListNode* temp = midpoint->next;
+		midpoint->next = nullptr;
+		//LinkedListNode* midpoint = FindMidpoint(head, *tail);
+		LinkedListNode* leftHalf = MergeSort(head, &midpoint);
+		LinkedListNode* rightHalf = MergeSort(temp, tail);
+		//PrintLinked(rightHalf);
+		//cout << "LEFT SIDE -----------------------------" << endl;
+		//PrintLinked(leftHalf);
+
+		//PrintLinked(rightHalf);
+		//cout << "-------" << endl;
+		LinkedListNode* ReturnList = MergeLists(leftHalf, rightHalf, tail, tail);
+		(*tail) = FindTail(ReturnList);
+		return ReturnList;
+	}
+	return nullptr;
+}
 
 int main()
 {
@@ -731,12 +744,15 @@ int main()
 			listTwoHead = BubbleSort(listTwoHead, &listTwoTail);
 			cout << "Sorting..." << endl;
 			cout << "Merging..." << endl;
-			head = MergeLists(head, listTwoHead);
+			head = MergeLists(head, listTwoHead, &tail, &listTwoTail);
+			tail = FindTail(head);
 			cout << "...Done!" << endl;
 			break;
 		}
 		case 9: {
-			cout << "Coming Soon!" << endl;
+			cout << "sorting..." << endl;
+			head = MergeSort(head, &tail);
+			cout << "          ...Done!" << endl;
 			break;
 		}
 		case 10: {
